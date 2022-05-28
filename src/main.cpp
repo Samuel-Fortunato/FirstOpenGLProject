@@ -1,168 +1,127 @@
-#include<iostream>
-#include<glad/glad.h>
-#include<GLFW/glfw3.h>
-#include"shader_s.h"
-#include"stb_image.h"
+#include <iostream>
+#include <glad/glad.h>
+#include <GLFW/glfw3.h>
+#include "shader_s.h"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
-GLFWwindow* setup_window(int windowWidth, int windowHeight, const char* windowTitle);
-void process_input(GLFWwindow* window);
-void setup_vertex_data(unsigned int* VBO, unsigned int* VAO, unsigned int* EBO);
+void processInput(GLFWwindow *window);
 
-// Settings
-int window_width = 1080;
-int window_height = 720;
-const char* window_title = "OpenGL Test";
+// settings
+const unsigned int SCR_WIDTH = 800;
+const unsigned int SCR_HEIGHT = 600;
 
-// Vertices
-float vertices[] = {
-	// positions				// colors					// texture coords
-	0.5f, 0.5f, 0.0f,			1.0f, 0.0f, 0.0f,			1.0f, 1.0f,	// top right
-	0.5f, -0.5f, 0.0f,			0.0f, 1.0f, 0.0f,			1.0f, 0.0f,	// bottom right
-	-0.5f, -0.5f, 0.0f,			0.0f, 0.0f, 1.0f,			0.0f, 0.0f,	// bottom left
-	-0.5f, 0.5f, 0.0f,			1.0f, 1.0f, 0.0f,			0.0f, 1.0f	// top left
-
-};
-unsigned int indices[] = { // note that we start from 0!
-	0, 1, 3,
-	1, 2, 3
-};
-
-int main() {
-	// INITIALIZE WINDOW
-	GLFWwindow* window = setup_window(window_width, window_height, window_title);
-	if (window == nullptr)
-	{		// Error check
-		return -1;
-	}
-	
-	// CREATE SHADER
-	Shader ourShader("src/shader.vert", "src/shader.frag");
-
-	// SET UP VERTEX DATA
-	unsigned int VBO;	// VBO = Vertex buffer object
-	unsigned int VAO;	// VAO = Vertex array object	
-	unsigned int EBO;	// EBO = Element buffer object
-	setup_vertex_data(&VBO, &VAO, &EBO);
-
-	// TEXTURES
-	unsigned int texture;
-	glGenTextures(1, &texture);
-	glBindTexture(GL_TEXTURE_2D, texture);
-	// wrapping / filtering options
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-	// load and generate the texture
-	int width, height, nrChannels;
-	unsigned char* data = stbi_load("resources/container.jpg", &width, &height, &nrChannels, 0);
-	// error check
-	if (data)
-	{
-		// generate texture
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-		glGenerateMipmap(GL_TEXTURE_2D);
-	}
-	else
-	{
-		std::cout << "Failed to load texture" << std::endl;
-	}
-
-	stbi_image_free(data);
-
-	// -----------------------------------MAIN WHILE LOOP------------------------------------------
-	// --------------------------------------------------------------------------------------------
-	while (!glfwWindowShouldClose(window))
-	{
-		process_input(window);
-
-		// Clear screen
-		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT);
-
-		ourShader.use();
-
-		// Render the triangle
-		glBindTexture(GL_TEXTURE_2D, texture);
-		glBindVertexArray(VAO);
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-
-		// Swap buffers and poll IO events
-		glfwSwapBuffers(window);
-		glfwPollEvents();
-	}
-
-	glfwTerminate();
-	return 0;
-}
-
-GLFWwindow* setup_window(int window_width, int window_height, const char* window_title) {
-	if (!glfwInit())		// Error check
-	{
-		std::cout << "Failed to initialize GLFW" << std::endl;
-		return nullptr;
-	};
-
+int main()
+{
+	// glfw: initialize and configure
+	// ------------------------------
+	glfwInit();
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-	GLFWwindow* window = glfwCreateWindow(window_width, window_height, window_title, nullptr, nullptr);
-	if (window == nullptr)		// Error check
+	// glfw window creation
+	// --------------------
+	GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "LearnOpenGL", NULL, NULL);
+	if (window == NULL)
 	{
 		std::cout << "Failed to create GLFW window" << std::endl;
 		glfwTerminate();
-		return nullptr;
+		return -1;
 	}
-
 	glfwMakeContextCurrent(window);
-
-	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))		// Error check
-	{
-		std::cout << "Failed to initialize GLAD" << std::endl;
-		return nullptr;
-	}
-
-	glViewport(0, 0, window_width, window_height);
-
-	// Automatically resize the window
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
-	return window;
-}
-void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
-	glViewport(0, 0, width, height);
-}
-void process_input(GLFWwindow* window) {
-	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+	// glad: load all OpenGL function pointers
+	// ---------------------------------------
+	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
 	{
-		glfwSetWindowShouldClose(window, true);
+		std::cout << "Failed to initialize GLAD" << std::endl;
+		return -1;
 	}
-}
-void setup_vertex_data(unsigned int* VBO, unsigned int* VAO, unsigned int* EBO) {
-	glGenBuffers(1, VBO);
-	glGenVertexArrays(1, VAO);
-	glGenBuffers(1, EBO);
 
-	// Bind VAO
-	glBindVertexArray(*VAO);
-	// Copy vertices to a buffer
-	glBindBuffer(GL_ARRAY_BUFFER, *VBO);
+	// build and compile our shader program
+	// ------------------------------------
+	Shader ourShader("src/shader.vert", "src/shader.frag"); // you can name your shader files however you like
+
+	// set up vertex data (and buffer(s)) and configure vertex attributes
+	// ------------------------------------------------------------------
+	float vertices[] = {
+		// positions		 // colors
+		 0.5f, -0.5f, 0.0f,  1.0f, 0.0f, 0.0f,  // bottom right
+		-0.5f, -0.5f, 0.0f,  0.0f, 1.0f, 0.0f,  // bottom left
+		 0.0f,  0.5f, 0.0f,  0.0f, 0.0f, 1.0f   // top 
+	};
+
+	unsigned int VBO, VAO;
+	glGenVertexArrays(1, &VAO);
+	glGenBuffers(1, &VBO);
+	// bind the Vertex Array Object first, then bind and set vertex buffer(s), and then configure vertex attributes(s).
+	glBindVertexArray(VAO);
+
+	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-	// Copy index array
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, *EBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
-	// SET VERTEX ATTRIBUTE POINTERS
 	// position attribute
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
 	// color attribute
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
 	glEnableVertexAttribArray(1);
-	// texture coords attribute
-	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
-	glEnableVertexAttribArray(2);
+
+	// You can unbind the VAO afterwards so other VAO calls won't accidentally modify this VAO, but this rarely happens. Modifying other
+	// VAOs requires a call to glBindVertexArray anyways so we generally don't unbind VAOs (nor VBOs) when it's not directly necessary.
+	// glBindVertexArray(0);
+
+
+	// render loop
+	// -----------
+	while (!glfwWindowShouldClose(window))
+	{
+		// input
+		// -----
+		processInput(window);
+
+		// render
+		// ------
+		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+		glClear(GL_COLOR_BUFFER_BIT);
+
+		// render the triangle
+		ourShader.use();
+		glBindVertexArray(VAO);
+		glDrawArrays(GL_TRIANGLES, 0, 3);
+
+		// glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
+		// -------------------------------------------------------------------------------
+		glfwSwapBuffers(window);
+		glfwPollEvents();
+	}
+
+	// optional: de-allocate all resources once they've outlived their purpose:
+	// ------------------------------------------------------------------------
+	glDeleteVertexArrays(1, &VAO);
+	glDeleteBuffers(1, &VBO);
+
+	// glfw: terminate, clearing all previously allocated GLFW resources.
+	// ------------------------------------------------------------------
+	glfwTerminate();
+	return 0;
 }
+
+// process all input: query GLFW whether relevant keys are pressed/released this frame and react accordingly
+// ---------------------------------------------------------------------------------------------------------
+void processInput(GLFWwindow *window)
+{
+	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+		glfwSetWindowShouldClose(window, true);
+}
+
+// glfw: whenever the window size changed (by OS or user resize) this callback function executes
+// ---------------------------------------------------------------------------------------------
+void framebuffer_size_callback(GLFWwindow* window, int width, int height)
+{
+	// make sure the viewport matches the new window dimensions; note that width and 
+	// height will be significantly larger than specified on retina displays.
+	glViewport(0, 0, width, height);
+}
+
