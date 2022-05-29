@@ -35,4 +35,4 @@
 build/
 
 # Buiild script
-build.sh
+build_n_run.sh
