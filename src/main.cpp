@@ -47,8 +47,8 @@ int main()
 	}
 
 	// configure global opengl state
-    // -----------------------------
-    glEnable(GL_DEPTH_TEST);
+	// -----------------------------
+	glEnable(GL_DEPTH_TEST);
 
 	// build and compile our shader program
 	// ------------------------------------
@@ -56,62 +56,62 @@ int main()
 
 	// set up vertex data (and buffer(s)) and configure vertex attributes
 	// ------------------------------------------------------------------
-	float vertices[] = {
-        -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
-         0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
-         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-        -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+	double vertices[] = {
+		-0.5, -0.5, -0.5,  0.0, 0.0,
+		 0.5, -0.5, -0.5,  1.0, 0.0,
+		 0.5,  0.5, -0.5,  1.0, 1.0,
+		 0.5,  0.5, -0.5,  1.0, 1.0,
+		-0.5,  0.5, -0.5,  0.0, 1.0,
+		-0.5, -0.5, -0.5,  0.0, 0.0,
 
-        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-         0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-         0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-         0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-        -0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
-        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+		-0.5, -0.5,  0.5,  0.0, 0.0,
+		 0.5, -0.5,  0.5,  1.0, 0.0,
+		 0.5,  0.5,  0.5,  1.0, 1.0,
+		 0.5,  0.5,  0.5,  1.0, 1.0,
+		-0.5,  0.5,  0.5,  0.0, 1.0,
+		-0.5, -0.5,  0.5,  0.0, 0.0,
 
-        -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-        -0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-        -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+		-0.5,  0.5,  0.5,  1.0, 0.0,
+		-0.5,  0.5, -0.5,  1.0, 1.0,
+		-0.5, -0.5, -0.5,  0.0, 1.0,
+		-0.5, -0.5, -0.5,  0.0, 1.0,
+		-0.5, -0.5,  0.5,  0.0, 0.0,
+		-0.5,  0.5,  0.5,  1.0, 0.0,
 
-         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-         0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-         0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-         0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+		 0.5,  0.5,  0.5,  1.0, 0.0,
+		 0.5,  0.5, -0.5,  1.0, 1.0,
+		 0.5, -0.5, -0.5,  0.0, 1.0,
+		 0.5, -0.5, -0.5,  0.0, 1.0,
+		 0.5, -0.5,  0.5,  0.0, 0.0,
+		 0.5,  0.5,  0.5,  1.0, 0.0,
 
-        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-         0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
-         0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-         0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+		-0.5, -0.5, -0.5,  0.0, 1.0,
+		 0.5, -0.5, -0.5,  1.0, 1.0,
+		 0.5, -0.5,  0.5,  1.0, 0.0,
+		 0.5, -0.5,  0.5,  1.0, 0.0,
+		-0.5, -0.5,  0.5,  0.0, 0.0,
+		-0.5, -0.5, -0.5,  0.0, 1.0,
 
-        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-        -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
-        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
-    };
+		-0.5,  0.5, -0.5,  0.0, 1.0,
+		 0.5,  0.5, -0.5,  1.0, 1.0,
+		 0.5,  0.5,  0.5,  1.0, 0.0,
+		 0.5,  0.5,  0.5,  1.0, 0.0,
+		-0.5,  0.5,  0.5,  0.0, 0.0,
+		-0.5,  0.5, -0.5,  0.0, 1.0
+	};
 	// world space positions of our cubes
-    glm::vec3 cubePositions[] = {
-        glm::vec3( 0.0f,  0.0f,  0.0f),
-        glm::vec3( 2.0f,  5.0f, -15.0f),
-        glm::vec3(-1.5f, -2.2f, -2.5f),
-        glm::vec3(-3.8f, -2.0f, -12.3f),
-        glm::vec3( 2.4f, -0.4f, -3.5f),
-        glm::vec3(-1.7f,  3.0f, -7.5f),
-        glm::vec3( 1.3f, -2.0f, -2.5f),
-        glm::vec3( 1.5f,  2.0f, -2.5f),
-        glm::vec3( 1.5f,  0.2f, -1.5f),
-        glm::vec3(-1.3f,  1.0f, -1.5f)
-    };
+	glm::vec3 cubePositions[] = {
+		glm::vec3( 0.0,  0.0,  0.0),
+		glm::vec3( 2.0,  5.0, -15.0),
+		glm::vec3(-1.5, -2.2, -2.5),
+		glm::vec3(-3.8, -2.0, -12.3),
+		glm::vec3( 2.4, -0.4, -3.5),
+		glm::vec3(-1.7,  3.0, -7.5),
+		glm::vec3( 1.3, -2.0, -2.5),
+		glm::vec3( 1.5,  2.0, -2.5),
+		glm::vec3( 1.5,  0.2, -1.5),
+		glm::vec3(-1.3,  1.0, -1.5)
+	};
 	unsigned int VBO, VAO;
 	glGenVertexArrays(1, &VAO);
 	glGenBuffers(1, &VBO);
@@ -122,10 +122,10 @@ int main()
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
 	// position attribute
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
+	glVertexAttribPointer(0, 3, GL_DOUBLE, GL_FALSE, 5 * sizeof(double), (void*)0);
 	glEnableVertexAttribArray(0);
 	// texture coord attribute
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
+	glVertexAttribPointer(1, 2, GL_DOUBLE, GL_FALSE, 5 * sizeof(double), (void*)(3 * sizeof(double)));
 	glEnableVertexAttribArray(1);
 
 
@@ -185,10 +185,11 @@ int main()
 	ourShader.setInt("texture1", 0);
 	ourShader.setInt("texture2", 1);
 
+
 	// pass projection matrix to shader (as projection matrix rarely changes there's no need to do this per frame)
-    // -----------------------------------------------------------------------------------------------------------
-    glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
-    ourShader.setMat4("projection", projection);
+	// -----------------------------------------------------------------------------------------------------------
+	glm::mat4 projection = glm::perspective(glm::radians(45.0), (double)SCR_WIDTH / (double)SCR_HEIGHT, 0.1, 100.0);
+	ourShader.setMat4("projection", projection);
 
 	// render loop
 	// -----------
@@ -213,19 +214,19 @@ int main()
 		ourShader.use();
 
 		// camera/view transformation
-		glm::mat4 view = glm::mat4(1.0f);
-		view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
+		glm::mat4 view = glm::mat4(1.0);
+		view = glm::translate(view, glm::vec3(0.0, 0.0, -3.0));
 		ourShader.setMat4("view", view);
 
-        // render boxes
-        glBindVertexArray(VAO);
+		// render boxes
+		glBindVertexArray(VAO);
 		for (unsigned int i = 0; i < 10; i++)
 		{
 			// calculate the model matrix for each object and pass it to the shader before drawing
-			glm::mat4 model = glm::mat4(1.0f);
+			glm::mat4 model = glm::mat4(1.0);
 			model = glm::translate(model, cubePositions[i]);
-			float angle = 20.0f * i;
-			model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
+			float angle = 20.0 * i;
+			model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0, 0.3, 0.5));
 			ourShader.setMat4("model", model);
 
 			glDrawArrays(GL_TRIANGLES, 0, 36);
