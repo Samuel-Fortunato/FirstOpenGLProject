@@ -214,8 +214,12 @@ int main()
 		ourShader.use();
 
 		// camera/view transformation
-		glm::mat4 view = glm::mat4(1.0);
-		view = glm::translate(view, glm::vec3(0.0, 0.0, -3.0));
+		// rotate camera in a circle
+		const double radius = 10.0;
+		double camX = sin(glfwGetTime()) * radius;
+		double camZ = cos(glfwGetTime()) * radius;
+		glm::mat4 view;
+		view = glm::lookAt(glm::vec3(camX, 0.0, camZ), glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0));
 		ourShader.setMat4("view", view);
 
 		// render boxes
