@@ -2,13 +2,22 @@ cmake_minimum_required(VERSION 3.10.2)
 
 project(opengl_test)
 
-add_executable(${PROJECT_NAME} src/main.cpp src/stb_img.cpp src/glad.c)
-target_include_directories(${PROJECT_NAME} PUBLIC src/include)
+add_executable(${PROJECT_NAME} src/main.cpp src/stb_img.cpp deps/glad.c)
+
+add_subdirectory(deps/glfw)
+
+target_include_directories(${PROJECT_NAME} PUBLIC
+	src/include/
+	deps/include/
+	deps/glfw/include/
+)
+
+target_link_directories(${PROJECT_NAME} PUBLIC
+	glfw/src/
+)
 
 if (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
-	target_link_libraries(${PROJECT_NAME} glfw3 GL X11 pthread Xrandr Xi dl)
+	target_link_libraries(${PROJECT_NAME} glfw GL X11 pthread Xrandr Xi dl)
 elseif (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
-	target_link_libraries(${PROJECT_NAME} glfw3.lib opengl32.lib)
+	target_link_libraries(${PROJECT_NAME} glfw.lib opengl32.lib)
 endif()
-
-#target_link_libraries(${PROJECT_NAME} glfw3 GL X11 pthread Xrandr Xi dl)
