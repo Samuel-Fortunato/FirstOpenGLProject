@@ -33,6 +33,3 @@
 
 # Build folder
 build/
-
-# Buiild script
-build_n_run.sh
