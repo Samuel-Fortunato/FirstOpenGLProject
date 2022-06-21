@@ -31,6 +31,9 @@ float lastY = SCR_HEIGHT / 2;
 float deltaTime = 0.0;	// Time between current frame and last frame
 float lastFrame = 0.0;	// Time of last frame
 
+// light source positioning
+glm::vec3 lightPos(1.2, 1.0, 2.0);
+
 int main()
 {
 	// glfw: initialize and configure
@@ -69,140 +72,81 @@ int main()
 	// -----------------------------
 	glEnable(GL_DEPTH_TEST);
 
-	// build and compile our shader program
+	// build and compile our shader programs
 	// ------------------------------------
-	Shader ourShader("resources/shader.vert", "resources/shader.frag"); // you can name your shader files however you like
+	Shader lightingShader("resources/lightingShader.vert", "resources/lightingShader.frag");
+	Shader lightSourceShader("resources/lightSource.vert", "resources/lightSource.frag");
 
 	// set up vertex data (and buffer(s)) and configure vertex attributes
 	// ------------------------------------------------------------------
 	float vertices[] = {
-		-0.5, -0.5, -0.5,  0.0, 0.0,
-		 0.5, -0.5, -0.5,  1.0, 0.0,
-		 0.5,  0.5, -0.5,  1.0, 1.0,
-		 0.5,  0.5, -0.5,  1.0, 1.0,
-		-0.5,  0.5, -0.5,  0.0, 1.0,
-		-0.5, -0.5, -0.5,  0.0, 0.0,
+        -0.5f, -0.5f, -0.5f, 
+         0.5f, -0.5f, -0.5f,  
+         0.5f,  0.5f, -0.5f,  
+         0.5f,  0.5f, -0.5f,  
+        -0.5f,  0.5f, -0.5f, 
+        -0.5f, -0.5f, -0.5f, 
 
-		-0.5, -0.5,  0.5,  0.0, 0.0,
-		 0.5, -0.5,  0.5,  1.0, 0.0,
-		 0.5,  0.5,  0.5,  1.0, 1.0,
-		 0.5,  0.5,  0.5,  1.0, 1.0,
-		-0.5,  0.5,  0.5,  0.0, 1.0,
-		-0.5, -0.5,  0.5,  0.0, 0.0,
+        -0.5f, -0.5f,  0.5f, 
+         0.5f, -0.5f,  0.5f,  
+         0.5f,  0.5f,  0.5f,  
+         0.5f,  0.5f,  0.5f,  
+        -0.5f,  0.5f,  0.5f, 
+        -0.5f, -0.5f,  0.5f, 
 
-		-0.5,  0.5,  0.5,  1.0, 0.0,
-		-0.5,  0.5, -0.5,  1.0, 1.0,
-		-0.5, -0.5, -0.5,  0.0, 1.0,
-		-0.5, -0.5, -0.5,  0.0, 1.0,
-		-0.5, -0.5,  0.5,  0.0, 0.0,
-		-0.5,  0.5,  0.5,  1.0, 0.0,
+        -0.5f,  0.5f,  0.5f, 
+        -0.5f,  0.5f, -0.5f, 
+        -0.5f, -0.5f, -0.5f, 
+        -0.5f, -0.5f, -0.5f, 
+        -0.5f, -0.5f,  0.5f, 
+        -0.5f,  0.5f,  0.5f, 
 
-		 0.5,  0.5,  0.5,  1.0, 0.0,
-		 0.5,  0.5, -0.5,  1.0, 1.0,
-		 0.5, -0.5, -0.5,  0.0, 1.0,
-		 0.5, -0.5, -0.5,  0.0, 1.0,
-		 0.5, -0.5,  0.5,  0.0, 0.0,
-		 0.5,  0.5,  0.5,  1.0, 0.0,
+         0.5f,  0.5f,  0.5f,  
+         0.5f,  0.5f, -0.5f,  
+         0.5f, -0.5f, -0.5f,  
+         0.5f, -0.5f, -0.5f,  
+         0.5f, -0.5f,  0.5f,  
+         0.5f,  0.5f,  0.5f,  
 
-		-0.5, -0.5, -0.5,  0.0, 1.0,
-		 0.5, -0.5, -0.5,  1.0, 1.0,
-		 0.5, -0.5,  0.5,  1.0, 0.0,
-		 0.5, -0.5,  0.5,  1.0, 0.0,
-		-0.5, -0.5,  0.5,  0.0, 0.0,
-		-0.5, -0.5, -0.5,  0.0, 1.0,
+        -0.5f, -0.5f, -0.5f, 
+         0.5f, -0.5f, -0.5f,  
+         0.5f, -0.5f,  0.5f,  
+         0.5f, -0.5f,  0.5f,  
+        -0.5f, -0.5f,  0.5f, 
+        -0.5f, -0.5f, -0.5f, 
 
-		-0.5,  0.5, -0.5,  0.0, 1.0,
-		 0.5,  0.5, -0.5,  1.0, 1.0,
-		 0.5,  0.5,  0.5,  1.0, 0.0,
-		 0.5,  0.5,  0.5,  1.0, 0.0,
-		-0.5,  0.5,  0.5,  0.0, 0.0,
-		-0.5,  0.5, -0.5,  0.0, 1.0
-	};
-	// world space positions of our cubes
-	glm::vec3 cubePositions[] = {
-		glm::vec3( 0.0,  0.0,  0.0),
-		glm::vec3( 2.0,  5.0, -15.0),
-		glm::vec3(-1.5, -2.2, -2.5),
-		glm::vec3(-3.8, -2.0, -12.3),
-		glm::vec3( 2.4, -0.4, -3.5),
-		glm::vec3(-1.7,  3.0, -7.5),
-		glm::vec3( 1.3, -2.0, -2.5),
-		glm::vec3( 1.5,  2.0, -2.5),
-		glm::vec3( 1.5,  0.2, -1.5),
-		glm::vec3(-1.3,  1.0, -1.5)
-	};
-	unsigned int VBO, VAO;
-	glGenVertexArrays(1, &VAO);
+        -0.5f,  0.5f, -0.5f, 
+         0.5f,  0.5f, -0.5f,  
+         0.5f,  0.5f,  0.5f,  
+         0.5f,  0.5f,  0.5f,  
+        -0.5f,  0.5f,  0.5f, 
+        -0.5f,  0.5f, -0.5f, 
+    };
+
+	unsigned int VBO, cubeVAO, lightVAO;
 	glGenBuffers(1, &VBO);
-
-	glBindVertexArray(VAO);
 
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-	// position attribute
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
+	glGenVertexArrays(1, &cubeVAO);
+	glGenVertexArrays(1, &lightVAO);
+
+	glBindVertexArray(cubeVAO);
+	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
-	// texture coord attribute
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
-	glEnableVertexAttribArray(1);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindVertexArray(0);
 
+	glBindVertexArray(lightVAO);
+	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindVertexArray(0);
 
-	// load and create a texture
-	// -------------------------
-	unsigned int texture1, texture2;
-	// texture 1
-	// ---------
-	glGenTextures(1, &texture1);
-	glBindTexture(GL_TEXTURE_2D, texture1);
-	// texture wrapping parameters
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	// texture filtering parameters
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	// load image, create texture and generate mipmaps
-	int width, height, nrChanels;
-	stbi_set_flip_vertically_on_load(true); // tell stb_image.h to flip loaded texture's on the y-axis
-	unsigned char *data = stbi_load("resources/container.jpg", &width, &height, &nrChanels, 0);
-	if (data)
-	{
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-		glGenerateMipmap(GL_TEXTURE_2D);
-	}
-	else
-	{
-		std::cout << "Failed to load texture1" << std::endl;
-	}
-	stbi_image_free(data);
-	// texture 2
-	// ---------
-	glGenTextures(1, &texture2);
-	glBindTexture(GL_TEXTURE_2D, texture2);
-	// texture weapping parameters
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	// texture filtering parameters
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	// load image, create texture and generate mipmaps
-	data = stbi_load("resources/awesomeface.png", &width, &height, &nrChanels, 0);
-	if (data)
-	{
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-		glGenerateMipmap(GL_TEXTURE_2D);
-	}
-	else
-	{
-		std::cout << "Failed to load texture2" << std::endl;
-	}
-	stbi_image_free(data);
-
-	// tell opengl for each sampler to which texture unit it belongs to (only has to be done once)
-	// -------------------------------------------------------------------------------------------
-	ourShader.use();
-	ourShader.setInt("texture1", 0);
-	ourShader.setInt("texture2", 1);
 
 	// render loop
 	// -----------
@@ -220,40 +164,40 @@ int main()
 
 		// render
 		// ------
-		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		// bind textures on corresponding texture units
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, texture1);
-		glActiveTexture(GL_TEXTURE1);
-		glBindTexture(GL_TEXTURE_2D, texture2);
+		// render light source
+		lightSourceShader.use();
 
-		// activate shader
-		ourShader.use();
-
-		// camera/view transformation
-		glm::mat4 view = camera.GetViewMatrix();
-		ourShader.setMat4("view", view);
-
-		// projection transformation
 		glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
-		ourShader.setMat4("projection", projection);
+		lightSourceShader.setMat4("projection", projection);
 
-		// render boxes
-		glBindVertexArray(VAO);
-		for (unsigned int i = 0; i < 10; i++)
-		{
-			// calculate the model matrix for each object and pass it to the shader before drawing
-			glm::mat4 model = glm::mat4(1.0);
-			model = glm::translate(model, cubePositions[i]);
-			float angle = 20.0 * i;
-			model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0, 0.3, 0.5));
-			ourShader.setMat4("model", model);
+		glm::mat4 view = camera.GetViewMatrix();
+		lightSourceShader.setMat4("view", view);
 
-			glDrawArrays(GL_TRIANGLES, 0, 36);
-		}
-		
+		glm::mat4 model(1.0);
+		model = glm::translate(model, lightPos);
+		model = glm::scale(model, glm::vec3(0.2));
+		lightSourceShader.setMat4("model", model);
+
+		glBindVertexArray(lightVAO);
+		glDrawArrays(GL_TRIANGLES, 0, 36);
+
+		// render container
+		lightingShader.use();
+
+		lightingShader.setVec3("objectColor", 1.0, 0.5, 0.31);
+		lightingShader.setVec3("lightColor", 1.0, 1.0, 1.0);
+
+		lightingShader.setMat4("projection", projection);
+		lightingShader.setMat4("view", view);
+
+		model = glm::mat4(1.0);
+		lightingShader.setMat4("model", model);
+
+		glBindVertexArray(cubeVAO);
+		glDrawArrays(GL_TRIANGLES, 0, 36);
 
 		// glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
 		// -------------------------------------------------------------------------------
@@ -263,7 +207,8 @@ int main()
 
 	// optional: de-allocate all resources once they've outlived their purpose:
 	// ------------------------------------------------------------------------
-	glDeleteVertexArrays(1, &VAO);
+	glDeleteVertexArrays(1, &cubeVAO);
+	glDeleteVertexArrays(1, &lightVAO);
 	glDeleteBuffers(1, &VBO);
 
 	// glfw: terminate, clearing all previously allocated GLFW resources.
