@@ -75,7 +75,7 @@ int main()
 
 	// build and compile our shader programs
 	// ------------------------------------
-	Shader lightingShader("resources/lightingShader.vert", "resources/lightingShader.frag");
+	Shader phongShader("resources/phongLighting.vert", "resources/phongLighting.frag");
 	Shader lightSourceShader("resources/lightSource.vert", "resources/lightSource.frag");
 
 	// set up vertex data (and buffer(s)) and configure vertex attributes
@@ -187,18 +187,18 @@ int main()
 		glDrawArrays(GL_TRIANGLES, 0, 36);
 
 		// render container
-		lightingShader.use();
+		phongShader.use();
 
-		lightingShader.setVec3("objectColor", 1.0, 0.5, 0.31);
-		lightingShader.setVec3("lightColor", 1.0, 1.0, 1.0);
-		lightingShader.setVec3("lightPos", lightPos);
-		lightingShader.setVec3("viewPos", camera.Position);
+		phongShader.setVec3("objectColor", 1.0, 0.5, 0.31);
+		phongShader.setVec3("lightColor", 1.0, 1.0, 1.0);
+		phongShader.setVec3("lightPos", lightPos);
+		phongShader.setVec3("viewPos", camera.Position);
 
-		lightingShader.setMat4("projection", projection);
-		lightingShader.setMat4("view", view);
+		phongShader.setMat4("projection", projection);
+		phongShader.setMat4("view", view);
 
 		model = glm::mat4(1.0);
-		lightingShader.setMat4("model", model);
+		phongShader.setMat4("model", model);
 
 		glBindVertexArray(cubeVAO);
 		glDrawArrays(GL_TRIANGLES, 0, 36);
