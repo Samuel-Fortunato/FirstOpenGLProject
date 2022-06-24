@@ -189,9 +189,16 @@ int main()
 		// render container
 		phongShader.use();
 
-		phongShader.setVec3("objectColor", 1.0, 0.5, 0.31);
-		phongShader.setVec3("lightColor", 1.0, 1.0, 1.0);
-		phongShader.setVec3("lightPos", lightPos);
+		phongShader.setVec3("material.ambient", 1.0, 0.5, 0.31);
+		phongShader.setVec3("material.diffuse", 1.0, 0.5, 0.31);
+		phongShader.setVec3("material.specular", 0.5, 0.5, 0.5);
+		phongShader.setFloat("material.shininess", 32.0);
+
+		phongShader.setVec3("light.ambient", 0.2, 0.2, 0.2);
+		phongShader.setVec3("light.diffuse", 0.5, 0.5, 0.5); // darkened
+		phongShader.setVec3("light.specular", 1.0, 1.0, 1.0);
+		phongShader.setVec3("light.position", lightPos);
+
 		phongShader.setVec3("viewPos", camera.Position);
 
 		phongShader.setMat4("projection", projection);
