@@ -194,8 +194,16 @@ int main()
 		phongShader.setVec3("material.specular", 0.5, 0.5, 0.5);
 		phongShader.setFloat("material.shininess", 32.0);
 
-		phongShader.setVec3("light.ambient", 0.2, 0.2, 0.2);
-		phongShader.setVec3("light.diffuse", 0.5, 0.5, 0.5); // darkened
+		glm::vec3 lightColor;
+		lightColor.x = sin(glfwGetTime() * 2.0);
+		lightColor.y = sin(glfwGetTime() * 0.7);
+		lightColor.z = sin(glfwGetTime() * 1.3);
+
+		glm::vec3 ambientColor = lightColor * glm::vec3(0.2);
+		glm::vec3 diffuseColor = lightColor * glm::vec3(0.5);
+
+		phongShader.setVec3("light.ambient", ambientColor);
+		phongShader.setVec3("light.diffuse", diffuseColor);
 		phongShader.setVec3("light.specular", 1.0, 1.0, 1.0);
 		phongShader.setVec3("light.position", lightPos);
 
