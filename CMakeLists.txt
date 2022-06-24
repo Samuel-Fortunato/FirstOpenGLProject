@@ -4,6 +4,10 @@ project(opengl_test)
 
 add_executable(${PROJECT_NAME} src/main.cpp deps/stb_img.cpp deps/glad.c)
 
+set(GLFW_BUILD_EXAMPLES OFF)
+set(GLFW_BUILD_TESTS OFF)
+set(GLFW_BUILD_DOCS OFF)
+
 add_subdirectory(./deps/glfw/)
 
 target_include_directories(${PROJECT_NAME} PUBLIC
