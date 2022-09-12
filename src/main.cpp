@@ -19,8 +19,8 @@ void processInput(GLFWwindow *window);
 unsigned int loadTexture(const char* path);
 
 // settings
-const unsigned int SCR_WIDTH = 800;
-const unsigned int SCR_HEIGHT = 600;
+unsigned int SCR_WIDTH = 1080;
+unsigned int SCR_HEIGHT = 720;
 
 // camera
 Camera camera(glm::vec3(0.0, 0.0, 3.0), glm::vec3(0.0, 1.0, 0.0), -90.0, 0.0);
@@ -126,6 +126,26 @@ int main()
         -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f,  1.0f
     };
 
+	glm::vec3 cubePositions[] = {
+		glm::vec3( 0.0f, 0.0f, 0.0f),
+		glm::vec3( 2.0f, 5.0f, -15.0f),
+		glm::vec3(-1.5f, -2.2f, -2.5f),
+		glm::vec3(-3.8f, -2.0f, -12.3f),
+		glm::vec3( 2.4f, -0.4f, -3.5f),
+		glm::vec3(-1.7f, 3.0f, -7.5f),
+		glm::vec3( 1.3f, -2.0f, -2.5f),
+		glm::vec3( 1.5f, 2.0f, -2.5f),
+		glm::vec3( 1.5f, 0.2f, -1.5f),
+		glm::vec3(-1.3f, 1.0f, -1.5f)
+	};
+
+	glm::vec3 pointLightPositions[] = {
+		glm::vec3( 0.7f, 0.2f, 2.0f),
+		glm::vec3( 2.3f, -3.3f, -4.0f),
+		glm::vec3(-4.0f, 2.0f, -12.0f),
+		glm::vec3( 0.0f, 0.0f, -3.0f)
+	};
+
 	unsigned int VBO, cubeVAO, lightVAO;
 	glGenBuffers(1, &VBO);
 
@@ -163,6 +183,7 @@ int main()
 	phongShader.use();
 	phongShader.setInt("material.diffuse", 0);
 	phongShader.setInt("material.specular", 1);
+	phongShader.setFloat("material.shininess", 32.0);
 
 	// render loop
 	// -----------
@@ -183,41 +204,76 @@ int main()
 		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		// render light source
-		lightSourceShader.use();
-
 		glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
-		lightSourceShader.setMat4("projection", projection);
-
 		glm::mat4 view = camera.GetViewMatrix();
+
+		// render light points
+		lightSourceShader.use();
+		lightSourceShader.setMat4("projection", projection);
 		lightSourceShader.setMat4("view", view);
-
-		glm::mat4 model(1.0);
-		model = glm::translate(model, lightPos);
-		model = glm::scale(model, glm::vec3(0.2));
-		lightSourceShader.setMat4("model", model);
-
-		glBindVertexArray(lightVAO);
-		glDrawArrays(GL_TRIANGLES, 0, 36);
+		for (int i = 0; i < 4; i++)
+		{
+			glm::mat4 model(1.0);
+			model = glm::translate(model, pointLightPositions[i]);
+			model = glm::scale(model, glm::vec3(0.2f));
+			lightSourceShader.setMat4("model", model);
+			glBindVertexArray(lightVAO);
+			glDrawArrays(GL_TRIANGLES, 0, 36);
+		}
+		
 
 		// render container
 		phongShader.use();
 
-		phongShader.setVec3("material.specular", 0.5, 0.5, 0.5);
-		phongShader.setFloat("material.shininess", 32.0);
+		phongShader.setVec3("dirLight.direction", -0.2f, -1.0f, -0.3f);	
+		phongShader.setVec3("dirLight.ambient", 0.2, 0.2, 0.2);
+		phongShader.setVec3("dirLight.diffuse", 1.0, 1.0, 1.0);
+		phongShader.setVec3("dirLight.specular", 1.0, 1.0, 1.0);
 
-		phongShader.setVec3("light.ambient", 0.2, 0.2, 0.2);
-		phongShader.setVec3("light.diffuse", 0.5, 0.5, 0.5);
-		phongShader.setVec3("light.specular", 1.0, 1.0, 1.0);
-		phongShader.setVec3("light.position", lightPos);
+		phongShader.setVec3("pointLights[0].position", pointLightPositions[0]);
+		phongShader.setVec3("pointLights[0].ambient", 0.2, 0.2, 0.2);
+		phongShader.setVec3("pointLights[0].diffuse", 1.0, 1.0, 1.0);
+		phongShader.setVec3("pointLights[0].specular", 1.0, 1.0, 1.0);
+		phongShader.setFloat("pointLights[0].constant", 1.0);
+		phongShader.setFloat("pointLights[0].linear", 0.14);
+		phongShader.setFloat("pointLights[0].quadratic", 0.07);
+
+		phongShader.setVec3("pointLights[1].position", pointLightPositions[1]);
+		phongShader.setVec3("pointLights[1].ambient", 0.2, 0.2, 0.2);
+		phongShader.setVec3("pointLights[1].diffuse", 1.0, 1.0, 1.0);
+		phongShader.setVec3("pointLights[1].specular", 1.0, 1.0, 1.0);
+		phongShader.setFloat("pointLights[1].constant", 1.0);
+		phongShader.setFloat("pointLights[1].linear", 0.14);
+		phongShader.setFloat("pointLights[1].quadratic", 0.07);
+
+		phongShader.setVec3("pointLights[2].position", pointLightPositions[2]);
+		phongShader.setVec3("pointLights[2].ambient", 0.2, 0.2, 0.2);
+		phongShader.setVec3("pointLights[2].diffuse", 1.0, 1.0, 1.0);
+		phongShader.setVec3("pointLights[2].specular", 1.0, 1.0, 1.0);
+		phongShader.setFloat("pointLights[2].constant", 1.0);
+		phongShader.setFloat("pointLights[2].linear", 0.14);
+		phongShader.setFloat("pointLights[2].quadratic", 0.07);
+
+		phongShader.setVec3("pointLights[3].position", pointLightPositions[3]);
+		phongShader.setVec3("pointLights[3].ambient", 0.2, 0.2, 0.2);
+		phongShader.setVec3("pointLights[3].diffuse", 1.0, 1.0, 1.0);
+		phongShader.setVec3("pointLights[3].specular", 1.0, 1.0, 1.0);
+		phongShader.setFloat("pointLights[3].constant", 1.0);
+		phongShader.setFloat("pointLights[3].linear", 0.14);
+		phongShader.setFloat("pointLights[3].quadratic", 0.07);
+
+		phongShader.setVec3("pointLights[4].position", pointLightPositions[4]);
+		phongShader.setVec3("pointLights[4].ambient", 0.2, 0.2, 0.2);
+		phongShader.setVec3("pointLights[4].diffuse", 1.0, 1.0, 1.0);
+		phongShader.setVec3("pointLights[4].specular", 1.0, 1.0, 1.0);
+		phongShader.setFloat("pointLights[4].constant", 1.0);
+		phongShader.setFloat("pointLights[4].linear", 0.14);
+		phongShader.setFloat("pointLights[4].quadratic", 0.07);
 
 		phongShader.setVec3("viewPos", camera.Position);
 
 		phongShader.setMat4("projection", projection);
 		phongShader.setMat4("view", view);
-
-		model = glm::mat4(1.0);
-		phongShader.setMat4("model", model);
 
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, diffuseMap);
@@ -225,8 +281,17 @@ int main()
 		glActiveTexture(GL_TEXTURE1);
 		glBindTexture(GL_TEXTURE_2D, specularMap);
 
-		glBindVertexArray(cubeVAO);
-		glDrawArrays(GL_TRIANGLES, 0, 36);
+		for(unsigned int i = 0; i < 10; i++)
+		{
+			glm::mat4 model = glm::mat4(1.0f);
+			model = glm::translate(model, cubePositions[i]);
+			float angle = 20.0f * i;
+			model = glm::rotate(model, glm::radians(angle),
+			glm::vec3(1.0f, 0.3f, 0.5f));
+			phongShader.setMat4("model", model);
+			glBindVertexArray(cubeVAO);
+			glDrawArrays(GL_TRIANGLES, 0, 36);
+		}
 
 		// glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
 		// -------------------------------------------------------------------------------
@@ -272,6 +337,8 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 	// make sure the viewport matches the new window dimensions; note that width and 
 	// height will be significantly larger than specified on retina displays.
 	glViewport(0, 0, width, height);
+	SCR_WIDTH = width;
+	SCR_HEIGHT = height;
 }
 
 // glfw: whenever the mouse moves, this callback is called
