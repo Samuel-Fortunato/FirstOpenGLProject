@@ -27,7 +27,7 @@ target_link_directories(${PROJECT_NAME} PUBLIC
 
 # libraries for windows or linux
 if (${CMAKE_SYSTEM_NAME} MATCHES "Linux")		# linux
-	target_link_libraries(${PROJECT_NAME} glfw GL X11 pthread Xrandr Xi dl)
+	target_link_libraries(${PROJECT_NAME} glfw assimp GL X11 pthread Xrandr Xi dl)
 elseif (${CMAKE_SYSTEM_NAME} MATCHES "Windows")		# windows
-	target_link_libraries(${PROJECT_NAME} glfw.lib opengl32.lib)
+	target_link_libraries(${PROJECT_NAME} glfw.lib opengl32.lib assimp)
 endif()
